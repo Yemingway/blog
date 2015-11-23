@@ -7,6 +7,9 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var settings = require('./settings');
+var session = require('express-session');
+var MongoStore = require('connect-mongo');
 
 var app = express();
 
@@ -56,4 +59,14 @@ app.use(function(err, req, res, next) {
   });
 });
 
+app.use(session({
+  secret:settings.cookieSecret,
+  key:settings.db,
+  cookie:{maxAge:1000*60*60*24*30},
+  store:new MongoStore({
+    db:settings.db,
+    host:settings.host,
+    port:settings.port
+  })
+}));
 module.exports = app;
