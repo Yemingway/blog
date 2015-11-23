@@ -20,5 +20,12 @@ ejs 三种标签
 
 ***
 
+# MongoDb 学习
+
+> 安装 MongoDB 很简单,去官网下载对应系统的 MongoDB 压缩包即可。解压后将文件夹重命名为 mongodb，并在 mongodb 文件夹里新建 blog 文件夹作为我们博客内容的存储目录。进入到 bin 目录下：运行：
+
+> mongod --dbpath ../blog/
+以上命令的意思是:设置 blog 文件夹作为我们工程的存储目录并启动数据库。
+
 
 
