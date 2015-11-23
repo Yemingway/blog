@@ -9,7 +9,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var settings = require('./settings');
 var session = require('express-session');
-var MongoStore = require('connect-mongo');
+var MongoStore = require('connect-mongo')(session);
 
 var app = express();
 
@@ -58,7 +58,7 @@ app.use(function (err, req, res, next) {
     error: {}
   });
 });
-
+app.use(cookieParser());
 app.use(session({
   secret: settings.cookieSecret,
   key: settings.db,
