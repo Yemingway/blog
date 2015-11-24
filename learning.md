@@ -93,6 +93,13 @@ req.param('name')
 
 >——《Node.js开发指南》
 
+## 注意的问题
+
+* 错误
+  > TypeError: Cannot set property 'user' of undefined
+* 解决
+  > app.use (session()) 要在 app.use('/',routes)前面
+
 ***
 
 # MongoDb 学习

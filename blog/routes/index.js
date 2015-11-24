@@ -5,11 +5,21 @@ var User = require('../models/user.js')
 
 /*GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('index', { title: '主页' });
+  res.render('index', {
+    title: '主页',
+    user: req.session.user,
+    success: req.flash('success').toString(),
+    error: req.flash('error').toString()
+  });
 });
 
 router.get('/reg', function (req, res) {
-  res.render('reg', { title: '注册' })
+  res.render('reg', {
+    title: '注册',
+    user: req.session.user,
+    success: req.flash('success').toString(),
+    error: req.flash('error').toString()
+  })
 });
 router.post('/reg', function (req, res) {
   var password = req.body.password,
@@ -31,16 +41,16 @@ router.post('/reg', function (req, res) {
   User.get(tempUser.name, function (err, user) {
     if (err) {
       req.flash('error', err);
-      res.redirect('/reg');
+      return res.redirect('/');
     }
     if (user) {
-      res.locals.error = '用户已经存在';
-      //req.flash('error', '用户已经存在');
+      req.flash('error', '用户已经存在');
+      return res.redirect('/reg');
     }
     tempUser.save(function (err, user) {
       if (err) {
-        res.render('error', 'error');
-        res.redirect('/reg');
+        res.render('error', err);
+        return res.redirect('/reg');
       }
       req.session.user = user;
       req.flash('success', '注册成功');
@@ -50,7 +60,12 @@ router.post('/reg', function (req, res) {
 
 });
 router.get('/login', function (req, res) {
-  res.render('login', { title: '登录' });
+  res.render('login', {
+    title: '登录',
+    user: req.session.user,
+    success: req.flash('success').toString(),
+    error: req.flash('error').toString()
+  });
 });
 router.post('/login', function (req, res) {
 });

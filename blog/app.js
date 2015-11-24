@@ -26,9 +26,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
-app.use('/', routes);
-app.use('/users', users);
-
 app.use(session({
   secret: settings.cookieSecret,
   key: settings.db,
@@ -42,6 +39,8 @@ app.use(session({
   saveUninitialized: true
 }));
 app.use(flash());
+app.use('/', routes);
+app.use('/users', users);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
