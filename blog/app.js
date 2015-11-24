@@ -41,7 +41,7 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }));
-app.use(flash);
+app.use(flash());
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

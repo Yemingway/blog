@@ -34,7 +34,8 @@ router.post('/reg', function (req, res) {
       res.redirect('/reg');
     }
     if (user) {
-      req.flash('error', '用户已经存在');
+      res.locals.error = '用户已经存在';
+      //req.flash('error', '用户已经存在');
     }
     tempUser.save(function (err, user) {
       if (err) {
