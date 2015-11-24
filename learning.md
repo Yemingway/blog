@@ -8,6 +8,81 @@ ejs 三种标签
 * <%=code %>: 显示替换过的html特殊字符
 * <%- code %>: 显示原始的html 内容
 
+##路由规则
+
+**req.query**
+
+> // GET /search?q=tobi+ferret  
+req.query.q  
+// => "tobi ferret"  
+
+> // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse  
+req.query.order  
+// => "desc"  
+
+> req.query.shoe.color  
+// => "blue"  
+
+req.query.shoe.type  
+// => "converse" 
+
+**req.body**
+
+> // POST user[name]=tobi&user[email]=tobi@learnboost.com  
+req.body.user.name  
+// => "tobi"  
+
+> req.body.user.email  
+// => "tobi@learnboost.com"  
+
+> // POST { "name": "tobi" }  
+req.body.name  
+// => "tobi"  
+
+** req.params**
+
+> // GET /user/tj  
+req.params.name  
+// => "tj"  
+
+> // GET /file/javascripts/jquery.js  
+req.params[0]  
+// => "javascripts/jquery.js"
+
+** req.param(name) **
+
+>// ?name=tobi  
+req.param('name')  
+// => "tobi"  
+
+>// POST name=tobi  
+req.param('name')  
+// => "tobi"  
+
+>// /user/tobi for /user/:name   
+req.param('name')  
+// => "tobi" 
+
+## supervisor的作用
+
+每次代码更新需要重启，有了这个模块就不用重新启动，**更改代码就会生效**
+
+> npm install -g supervisor
+
+安装过后的启动命令是
+
+> supervisor app.js
+
+遇到一个错误
+
+> Supervisor node .js “Program node app exited with code 0” error
+
+因为app.listen 不在 app.js内部，这种情况有可能在/bin/www中，所以要使用 supervisor ./bin/www
+
+## 页面通知
+
+使用flash把一些错误或者成功信息传递到页面，他是session中的一个存储区域。[(https://github.com/jaredhanson/connect-flash)](https://github.com/jaredhanson/connect-flash)
+
 ***
 
 ## 会话
@@ -26,6 +101,9 @@ ejs 三种标签
 
 > mongod --dbpath ../blog/
 以上命令的意思是:设置 blog 文件夹作为我们工程的存储目录并启动数据库。
+
+***
+
 
 
 

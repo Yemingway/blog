@@ -10,8 +10,10 @@ var users = require('./routes/users');
 var settings = require('./settings');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
+var flash = require('connect-flash');
 
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,11 +24,24 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cookieParser());
 app.use('/', routes);
 app.use('/users', users);
+
+app.use(session({
+  secret: settings.cookieSecret,
+  key: settings.db,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
+  store: new MongoStore({
+    db: settings.db,
+    host: settings.host,
+    port: settings.port
+  }),
+  resave: false,
+  saveUninitialized: true
+}));
+app.use(flash);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -58,17 +73,18 @@ app.use(function (err, req, res, next) {
     error: {}
   });
 });
-app.use(cookieParser());
-app.use(session({
-  secret: settings.cookieSecret,
-  key: settings.db,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
-  store: new MongoStore({
-    db: settings.db,
-    host: settings.host,
-    port: settings.port
-  }),
-  resave: false,
-  saveUninitialized: true
-}));
+
+// app.use(session({
+//   secret: settings.cookieSecret,
+//   key: settings.db,
+//   cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
+//   store: new MongoStore({
+//     db: settings.db,
+//     host: settings.host,
+//     port: settings.port
+//   }),
+//   resave: false,
+//   saveUninitialized: true
+// }));
+// app.use(flash());
 module.exports = app;
