@@ -112,12 +112,16 @@ req.param('name')
 ## MongoDb 操作
 
 1. insert操作
-
 > db.person.insert({'name':'jack','age':20})
 
 2. find操作
 > db.person.find({'name':'joe'})
 
+3. update 操作
+> db.person.update({'name':'joe'},{'name':'joe','age':25})
+
+4. remove操作
+> db.person.remove() 删除所有数据
 
 ***
 
