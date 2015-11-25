@@ -13,6 +13,7 @@ router.get('/', function (req, res, next) {
   });
 });
 
+router.get('/reg', checkNotLogin);
 router.get('/reg', function (req, res) {
   res.render('reg', {
     title: '注册',
@@ -21,6 +22,8 @@ router.get('/reg', function (req, res) {
     error: req.flash('error').toString()
   })
 });
+
+router.post('/reg', checkNotLogin);
 router.post('/reg', function (req, res) {
   var password = req.body.password,
     name = req.body.name,
@@ -59,8 +62,9 @@ router.post('/reg', function (req, res) {
       res.redirect('/');
     });
   });
-
 });
+
+router.get('/login', checkNotLogin);
 router.get('/login', function (req, res) {
   res.render('login', {
     title: '登录',
@@ -69,6 +73,8 @@ router.get('/login', function (req, res) {
     error: req.flash('error').toString()
   });
 });
+
+router.post('/login', checkNotLogin);
 router.post('/login', function (req, res) {
   var md5 = crypto.createHash('md5'),
     password = md5.update(req.body.password).digest('hex');
@@ -90,14 +96,35 @@ router.post('/login', function (req, res) {
     res.redirect('/');
   });
 });
+
+router.get('/post', checkLogin);
 router.get('/post', function (req, res) {
   res.render('post', { title: '发表' });
 });
+
+router.post('/post', checkLogin);
 router.post('/post', function (req, res) {
 });
+router.get('/logout', checkLogin);
 router.get('/logout', function (req, res) {
   req.flash('success', '登出成功！');
   req.session.user = null;
   res.redirect('/');
 });
+
+function checkLogin(req, res, next) {
+  if (!req.session.user) {
+    req.flash('error', '用户未登录！');
+    res.redirect('/login');
+  }
+  next();
+}
+
+function checkNotLogin(req, res, next) {
+  if (req.session.user) {
+    req.flash('error', '用户已经登录！');
+    res.redirect('/');
+  }
+  next();
+}
 module.exports = router;

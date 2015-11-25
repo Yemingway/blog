@@ -93,6 +93,27 @@ req.param('name')
 
 >——《Node.js开发指南》
 
+## 中间件
+
+> 例如index.js中的代码
+
+>   `router.get('/logout',checkLogin);
+   router.get('/logout', function (req, res) {
+      req.flash('success', '登出成功！');
+      req.session.user = null;
+      res.redirect('/');
+   });
+   function checkLogin(req,res,next){
+     if(!req.session.user){
+       req.flash('error','用户未登录！');
+       res.redirect('/login');
+     }
+     next();
+   }`
+   
+> 启动程序的时候会顺序注册回调函数，当用户在此访问logout的页面，这个时候先回调用回调函数checklogin,如果没有next中间件，在user存在的情况下
+就不会做flash用户未登录，以及跳转到login页面。 
+ 
 ## 注意的问题
 
 * 错误
