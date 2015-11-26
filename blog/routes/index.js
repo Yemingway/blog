@@ -135,7 +135,21 @@ router.get('/logout', function (req, res) {
   req.session.user = null;
   res.redirect('/');
 });
+router.get('/upload', checkLogin);
+router.get('/upload', function (req, res) {
+  res.render('upload', {
+    title: '发表',
+    user: req.session.user,
+    success: req.flash('success').toString(),
+    error: req.flash('error').toString()
+  });
+});
 
+router.post('/upload', checkLogin);
+router.post('/upload', function (req, res) {
+  req.flash('success', '上传成功');
+  res.redirect('/upload');
+});
 function checkLogin(req, res, next) {
   if (!req.session.user) {
     req.flash('error', '用户未登录！');

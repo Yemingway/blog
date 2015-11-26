@@ -120,6 +120,11 @@ req.param('name')
   > TypeError: Cannot set property 'user' of undefined
 * 解决
   > app.use (session()) 要在 app.use('/',routes)前面
+* app.use 和 app.get区别
+> [参照stackoverflow上的解释](http://stackoverflow.com/questions/15601703/difference-between-app-use-and-app-get-in-express-js)
+> 1. app.use()可以绑定中间件。并且app.use()可以处理各种请求
+> 比如 GET/ POST PUT etc
+> 2. app.get() 当有http请求的时候（get请求）只能处理传递过来的路径的get请求。
 
 ***
 
