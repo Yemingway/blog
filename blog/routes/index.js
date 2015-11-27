@@ -6,7 +6,7 @@ var Post = require('../models/post.js')
 
 /*GET home page. */
 router.get('/', function (req, res) {
-  Post.get(null, function (err, posts) {
+  Post.get(null, null, null, function (err, posts) {
     if (err) {
       posts = null;
     }
@@ -150,6 +150,44 @@ router.post('/upload', function (req, res) {
   req.flash('success', '上传成功');
   res.redirect('/upload');
 });
+
+router.get('/u/:name', function (req, res) {
+  User.get(req.params.name, function (err, user) {
+    if (!user) {
+      req.flash('error', '用户不存在！');
+      res.redirect('/');
+    }
+    Post.get(user.name, null, null, function (err, posts) {
+      if (err) {
+        req.flash('error', err);
+        return res.redirect('/');
+      }
+      res.render('user', {
+        posts: posts,
+        title: user.name,
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+      });
+    });
+  });
+});
+
+router.get('/u/:name/:day/:title', function (req, res) {
+  Post.get(req.params.name, req.params.title, req.params.day, function (err, posts) {
+    if (err) {
+      req.flash('error', err);
+    }
+    res.render('article', {
+      post: posts[0],
+      title: req.params.name,
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    });
+  });
+});
+
 function checkLogin(req, res, next) {
   if (!req.session.user) {
     req.flash('error', '用户未登录！');

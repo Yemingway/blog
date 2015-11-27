@@ -50,7 +50,9 @@ Post.prototype.save = function (callback) {
 	})
 }
 
-Post.get = function (name, callback) {
+//get all user's articles if name is null
+//get one user's articles if name is not null.
+Post.get = function (name, title, day, callback) {
 	mongodb.open(function (err, db) {
 		if (err) {
 			return callback(err);
@@ -64,13 +66,19 @@ Post.get = function (name, callback) {
 			if (name) {
 				query.name = name;
 			}
+			if(title){
+				query.title = title;
+			}
+			if(day){
+				query.day.time = day;
+			}
 			collection.find(query).sort({ time: -1 }).toArray(function (err, docs) {
 				mongodb.close();
 				if (err) {
 					return callback(err);
 				}
 				//解析markdown为html
-				docs.forEach(function(doc){
+				docs.forEach(function (doc) {
 					doc.post = markdown.toHTML(doc.post);
 				});
 				callback(null, docs);

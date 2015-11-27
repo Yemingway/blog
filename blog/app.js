@@ -44,12 +44,23 @@ app.use('/', routes);
 app.use('/users', users);
 
 //?why cannot upload files? Need to fix it.
-app.use(multer({
+app.use('/post', multer({
   dest: './public/images',
   rename: function (fieldname, filename) {
+    console.log('here');
     return filename;
   }
 }));
+// app.use(multer({
+//   storage: multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, './public/images')
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, file.fieldname)
+//     }
+//   })
+// }));
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   var err = new Error('Not Found');
