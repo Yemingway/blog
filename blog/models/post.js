@@ -64,13 +64,13 @@ Post.get = function (name, title, day, callback) {
 			}
 			var query = {};
 			if (name) {
-				query.name = name;
+				query['name'] = name;
 			}
 			if(title){
-				query.title = title;
+				query['title'] = title;
 			}
 			if(day){
-				query.day.time = day;
+				query['time.day'] = day;
 			}
 			collection.find(query).sort({ time: -1 }).toArray(function (err, docs) {
 				mongodb.close();

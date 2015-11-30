@@ -177,6 +177,7 @@ router.get('/u/:name/:day/:title', function (req, res) {
   Post.get(req.params.name, req.params.title, req.params.day, function (err, posts) {
     if (err) {
       req.flash('error', err);
+      return res.redirect('/');
     }
     res.render('article', {
       post: posts[0],
