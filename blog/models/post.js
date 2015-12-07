@@ -66,10 +66,10 @@ Post.get = function (name, title, day, callback) {
 			if (name) {
 				query['name'] = name;
 			}
-			if(title){
+			if (title) {
 				query['title'] = title;
 			}
-			if(day){
+			if (day) {
 				query['time.day'] = day;
 			}
 			collection.find(query).sort({ time: -1 }).toArray(function (err, docs) {
@@ -82,6 +82,37 @@ Post.get = function (name, title, day, callback) {
 					doc.post = markdown.toHTML(doc.post);
 				});
 				callback(null, docs);
+			});
+		});
+	});
+}
+
+Post.delete = function (name, title, day, callback) {
+	mongodb.open(function (err, db) {
+		if (err) {
+			return callback(err);
+		}
+		db.collection('posts', function (err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			var deleteItem = {};
+			if (name) {
+				deleteItem['name'] = name;
+			}
+			if (title) {
+				deleteItem['title'] = title;
+			}
+			if (day) {
+				deleteItem['time.day'] = day;
+			}
+			collection.remove(deleteItem, { w: 1 }, function (err) {
+				mongodb.close();
+				if (err) {
+					return callback(err);
+				}
+				callback(null);
 			});
 		});
 	});

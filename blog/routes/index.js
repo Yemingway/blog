@@ -188,7 +188,35 @@ router.get('/u/:name/:day/:title', function (req, res) {
     });
   });
 });
-
+router.get('/edit/:name/:day/:title', checkLogin);
+router.get('/edit/:name/:day/:title', function (req, res) {
+  var currentUser = req.session.user;
+  Post.get(currentUser.name, req.params.day, req.params.title, function (err, posts) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('back');
+    }
+    res.render('edit', {
+      title: '编辑',
+      post: posts[0],
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    });
+  });
+});
+router.get('/remove/:name/:day/:title', checkLogin);
+router.get('/remove/:name/:day/:title', function (req, res) {
+  var currentUser = req.session.user;
+  Post.delete(currentUser.name, req.params.day, req.params.title, function (err) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('back');
+    }
+    req.flash('success', '删除成功!');
+    res.redirect('/');
+  });
+});
 function checkLogin(req, res, next) {
   if (!req.session.user) {
     req.flash('error', '用户未登录！');
