@@ -6,7 +6,7 @@ var Post = require('../models/post.js')
 
 /*GET home page. */
 router.get('/', function (req, res) {
-  Post.get(null, null, null, function (err, posts) {
+  Post.get(null, null, null, false, function (err, posts) {
     if (err) {
       posts = null;
     }
@@ -157,7 +157,7 @@ router.get('/u/:name', function (req, res) {
       req.flash('error', '用户不存在！');
       res.redirect('/');
     }
-    Post.get(user.name, null, null, function (err, posts) {
+    Post.get(user.name, null, null, false, function (err, posts) {
       if (err) {
         req.flash('error', err);
         return res.redirect('/');
@@ -174,7 +174,7 @@ router.get('/u/:name', function (req, res) {
 });
 
 router.get('/u/:name/:day/:title', function (req, res) {
-  Post.get(req.params.name, req.params.title, req.params.day, function (err, posts) {
+  Post.get(req.params.name, req.params.title, req.params.day, false, function (err, posts) {
     if (err) {
       req.flash('error', err);
       return res.redirect('/');
@@ -191,7 +191,7 @@ router.get('/u/:name/:day/:title', function (req, res) {
 router.get('/edit/:name/:day/:title', checkLogin);
 router.get('/edit/:name/:day/:title', function (req, res) {
   var currentUser = req.session.user;
-  Post.get(currentUser.name, req.params.day, req.params.title, function (err, posts) {
+  Post.get(currentUser.name, req.params.title, req.params.day, true, function (err, posts) {
     if (err) {
       req.flash('error', err);
       return res.redirect('back');
@@ -208,14 +208,31 @@ router.get('/edit/:name/:day/:title', function (req, res) {
 router.get('/remove/:name/:day/:title', checkLogin);
 router.get('/remove/:name/:day/:title', function (req, res) {
   var currentUser = req.session.user;
-  Post.delete(currentUser.name, req.params.day, req.params.title, function (err) {
-    if (err) {
-      req.flash('error', err);
-      return res.redirect('back');
-    }
-    req.flash('success', '删除成功!');
-    res.redirect('/');
-  });
+  Post.delete(currentUser.name, req.params.title, req.params.day,
+    function (err) {
+      if (err) {
+        req.flash('error', err);
+        return res.redirect('back');
+      }
+      req.flash('success', '删除成功!');
+      res.redirect('/');
+    });
+});
+router.post('/edit/:name/:day/:title', checkLogin);
+router.post('/edit/:name/:day/:title', function (req, res) {
+  var currentUser = req.session.user;
+  Post.update(req.params.name, req.params.title,
+    req.params.day, req.body.post,
+    function (err) {
+      var url = encodeURI('/u/' + currentUser.name
+        + '/' + req.params.day + '/' + req.params.title);
+      if (err) {
+        req.flash('error', err);
+        return res.redirect(url);
+      }
+      req.flash('success', '保存成功！');
+      res.redirect(url);
+    });
 });
 function checkLogin(req, res, next) {
   if (!req.session.user) {

@@ -9,6 +9,7 @@ function Post(name, title, post) {
 
 module.exports = Post;
 
+//Just like public method and related with the property, need to write it in protorype.
 Post.prototype.save = function (callback) {
 	var date = new Date();
 	//存储各种时间格式，方便以后扩展
@@ -50,9 +51,10 @@ Post.prototype.save = function (callback) {
 	})
 }
 
+//Just like static method.
 //get all user's articles if name is null
 //get one user's articles if name is not null.
-Post.get = function (name, title, day, callback) {
+Post.get = function (name, title, day, isEdit, callback) {
 	mongodb.open(function (err, db) {
 		if (err) {
 			return callback(err);
@@ -77,10 +79,12 @@ Post.get = function (name, title, day, callback) {
 				if (err) {
 					return callback(err);
 				}
-				//解析markdown为html
-				docs.forEach(function (doc) {
-					doc.post = markdown.toHTML(doc.post);
-				});
+				if (!isEdit) {
+					//解析markdown为html
+					docs.forEach(function (doc) {
+						doc.post = markdown.toHTML(doc.post);
+					});
+				}
 				callback(null, docs);
 			});
 		});
@@ -114,6 +118,36 @@ Post.delete = function (name, title, day, callback) {
 				}
 				callback(null);
 			});
+		});
+	});
+}
+
+Post.update = function (name, title, day, post, callback) {
+	mongodb.open(function (err, db) {
+		if (err) {
+			return callback(err);
+		}
+		db.collection('posts', function (err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			collection.update(
+				{
+					'title': title,
+					'name': name,
+					'time.day': day
+				},
+				{
+					$set: { 'post': post }
+				},
+				function (err) {
+					mongodb.close();
+                    if (err) {
+						return callback(err);
+					}
+					callback(null);
+				});
 		});
 	});
 }
