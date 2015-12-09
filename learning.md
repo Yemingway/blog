@@ -145,11 +145,39 @@ req.param('name')
 
 3. update 操作
 > db.person.update({'name':'joe'},{'name':'joe','age':25})
-
-4. remove操作
+> db.person.update({'name':'joe'},{$set:{'age':25}})
 > db.person.remove() 删除所有数据
-
+4. mongodb 修改器($inc/$set/$unset/$push/$pop/upsert...)
+  * 数组修改器 $push 示例操作效果如下：
+> `> db.c.find()
+{ "_id" : ObjectId("5003be465af21ff428dafbe7"), "name" : "toyota", "type" : "suv", 
+"size" : { "height" : 8, "width" : 7, "length" : 15 } }`
+ * 先push一个当前文档中不存在的键title
+>`> db.c.update({"name" : "toyota"},{$push:{"title":"t1"}})`
+> `> db.c.find()
+{ "_id" : ObjectId("5003be465af21ff428dafbe7"), "name" : "toyota", "size" : { "height" : 8,
+ "width" : 7, "length" : 15 }, "title" : [ "t1" ], "type" : "suv" }`
+  * 再向title中push一个值
+> `> db.c.update({"name" : "toyota"},{$push:{"title":"t2"}})`
+> `> db.c.find()
+{ "_id" : ObjectId("5003be465af21ff428dafbe7"), "name" : "toyota", "size" : { "height" : 8,
+ "width" : 7, "length" : 15 }, "title" : [ "t1", "t2" ], "type" : "suv" }`
+ 
+ * --再向title中push一个值
+> `> db.c.update({"name" : "toyota"},{$push:{"title":"t2"}})`
+> `> db.c.find()
+{ "_id" : ObjectId("5003be465af21ff428dafbe7"), "name" : "toyota", "size" : { "height" : 8,
+ "width" : 7, "length" : 15 }, "title" : [ "t1", "t2", "t2" ], "type" : "suv" }`
+ 
+ * --再向一个已经存在的键值非数组类型的键push一个值
+> `> db.c.update({"name" : "toyota"},{$push:{"size.height":10}})
+Cannot apply $push/$pushAll modifier to non-array`
+> `> db.c.update({"name" : "toyota"},{$push:{"name":"ddddddd"}})
+Cannot apply $push/$pushAll modifier to non-array`
+ 
+ > 得出结论：$push--向文档的某个数组类型的键添加一个数组元素，不过滤重复的数据。添加时键存在，要求键值类型必须是数组；键不存在，则创建数组类型的键。
 ***
+
 
 
 
