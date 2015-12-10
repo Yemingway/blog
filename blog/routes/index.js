@@ -7,7 +7,8 @@ var Comment = require('../models/comment.js');
 
 /*GET home page. */
 router.get('/', function (req, res) {
-  Post.get(null, null, null, false, function (err, posts) {
+  var page = parseInt(req.query.p) || 1;
+  Post.getTen(null, page, function (err, posts, total) {
     if (err) {
       posts = null;
     }
@@ -15,11 +16,13 @@ router.get('/', function (req, res) {
       title: '主页',
       user: req.session.user,
       posts: posts,
+      page: page,
+      isFirstPage: page == 1,
+      isLastPage: (page - 1) * 10 + posts.length == total,
       success: req.flash('success').toString(),
       error: req.flash('error').toString()
     });
   });
-
 });
 
 router.get('/reg', checkNotLogin);
@@ -158,7 +161,8 @@ router.get('/u/:name', function (req, res) {
       req.flash('error', '用户不存在！');
       res.redirect('/');
     }
-    Post.get(user.name, null, null, false, function (err, posts) {
+    var page = parseInt(req.query.p) || 1;
+    Post.getTen(user.name, page, function (err, posts, total) {
       if (err) {
         req.flash('error', err);
         return res.redirect('/');
@@ -167,6 +171,9 @@ router.get('/u/:name', function (req, res) {
         posts: posts,
         title: user.name,
         user: req.session.user,
+        page: page,
+        isFirstPage: page == 1,
+        isLastPage: (page - 1) * 10 + posts.length == total,
         success: req.flash('success').toString(),
         error: req.flash('error').toString()
       });
@@ -200,7 +207,7 @@ router.post('/u/:name/:day/:title', function (req, res) {
     time: time,
     content: req.body.content
   };
-  newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
+  var newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
   newComment.save(function (err) {
     if (err) {
       req.flash('error', err);

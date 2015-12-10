@@ -176,6 +176,8 @@ Cannot apply $push/$pushAll modifier to non-array`
 Cannot apply $push/$pushAll modifier to non-array`
  
  > 得出结论：$push--向文档的某个数组类型的键添加一个数组元素，不过滤重复的数据。添加时键存在，要求键值类型必须是数组；键不存在，则创建数组类型的键。
+ 
+ 4.sort() 方法排序 ｛a:1｝以a升序排列 -1 降序排列
 ***
 
 

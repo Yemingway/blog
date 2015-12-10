@@ -27,7 +27,7 @@ Post.prototype.save = function (callback) {
 		time: time,
 		title: this.title,
 		post: this.post,
-		comments:[]
+		comments: []
 	};
 
 	mongodb.open(function (err, db) {
@@ -84,7 +84,7 @@ Post.get = function (name, title, day, isEdit, callback) {
 					//解析markdown为html
 					docs.forEach(function (doc) {
 						doc.post = markdown.toHTML(doc.post);
-						doc.comments.forEach(function(comment){
+						doc.comments.forEach(function (comment) {
 							comment.content = markdown.toHTML(comment.content);
 						});
 					});
@@ -94,7 +94,36 @@ Post.get = function (name, title, day, isEdit, callback) {
 		});
 	});
 }
-
+Post.getTen = function (name, page, callback) {
+	mongodb.open(function (err, db) {
+		if (err) {
+			mongodb.close();
+			return callback(err);
+		}
+		db.collection('posts', function (err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			var query = {};
+			if (name) {
+				query['name'] = name;
+			}
+			collection.count(query, function (err, total) {
+				collection.find(query, { limit: 10, skip: (page - 1) * 10 }).sort({ time: -1 }).toArray(function (err, docs) {
+					mongodb.close();
+					if (err) {
+						return callback(err);
+					}
+					docs.forEach(function (doc) {
+						doc.post = markdown.toHTML(doc.post);
+					});
+					callback(null, docs, total);
+				});
+			});
+		});
+	});
+}
 Post.delete = function (name, title, day, callback) {
 	mongodb.open(function (err, db) {
 		if (err) {
