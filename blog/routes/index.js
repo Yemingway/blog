@@ -263,6 +263,24 @@ router.post('/edit/:name/:day/:title', function (req, res) {
       res.redirect(url);
     });
 });
+
+router.get('/archive', checkLogin);
+router.get('/archive', function (req, res) {
+  var name = req.session.user.name;
+  Post.getArchive(name, function (err, docs) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('/');
+    }
+    res.render('archive',{
+      title: '归档',
+      posts: docs,
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    });
+  });
+});
 function checkLogin(req, res, next) {
   if (!req.session.user) {
     req.flash('error', '用户未登录！');

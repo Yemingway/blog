@@ -94,6 +94,27 @@ Post.get = function (name, title, day, isEdit, callback) {
 		});
 	});
 }
+Post.getArchive = function (name, callback) {
+	mongodb.open(function (err, db) {
+		if (err) {
+			db.close();
+			return callback(err);
+		}
+		db.collection("posts", function (err, collection) {
+			if (err) {
+				db.close();
+				return callback(err);
+			}
+			collection.find({ 'name': name }, { 'name': 1, 'title': 1, 'time': 1 }).sort({ time: -1 }).toArray(function (err, docs) {
+				db.close();
+				if (err) {
+					return callback(err);
+				}
+				callback(null, docs);
+			});
+		});
+	});
+}
 Post.getTen = function (name, page, callback) {
 	mongodb.open(function (err, db) {
 		if (err) {
