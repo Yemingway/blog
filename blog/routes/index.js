@@ -122,7 +122,8 @@ router.get('/post', function (req, res) {
 router.post('/post', checkLogin);
 router.post('/post', function (req, res) {
   var currentUser = req.session.user,
-    post = new Post(currentUser.name, req.body.title, req.body.post);
+    tags = [req.body.tag1, req.body.tag2, req.body.tag3],
+    post = new Post(currentUser.name, req.body.title, req.body.post, tags);
   post.save(function (err) {
     if (err) {
       req.flash('error', err);
@@ -252,6 +253,7 @@ router.post('/edit/:name/:day/:title', function (req, res) {
   var currentUser = req.session.user;
   Post.update(req.params.name, req.params.title,
     req.params.day, req.body.post,
+    [req.body.tag0, req.body.tag1, req.body.tag2],
     function (err) {
       var url = encodeURI('/u/' + currentUser.name
         + '/' + req.params.day + '/' + req.params.title);
@@ -272,13 +274,28 @@ router.get('/archive', function (req, res) {
       req.flash('error', err);
       return res.redirect('/');
     }
-    res.render('archive',{
+    res.render('archive', {
       title: '归档',
       posts: docs,
       user: req.session.user,
       success: req.flash('success').toString(),
       error: req.flash('error').toString()
     });
+  });
+});
+router.get('/tag', function (req, res) {
+  Post.getTags(function (err, tags) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('/');
+    }
+    res.render('tag', {
+      title: '标签',
+      tags: tags,
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    })
   });
 });
 function checkLogin(req, res, next) {

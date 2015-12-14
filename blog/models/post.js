@@ -1,10 +1,11 @@
 var mongodb = require('./db');
 var markdown = require('markdown').markdown;
 
-function Post(name, title, post) {
+function Post(name, title, post, tags) {
 	this.name = name;
 	this.title = title;
 	this.post = post;
+	this.tags = tags;
 }
 
 module.exports = Post;
@@ -27,7 +28,8 @@ Post.prototype.save = function (callback) {
 		time: time,
 		title: this.title,
 		post: this.post,
-		comments: []
+		comments: [],
+		tags: this.tags
 	};
 
 	mongodb.open(function (err, db) {
@@ -176,7 +178,7 @@ Post.delete = function (name, title, day, callback) {
 	});
 }
 
-Post.update = function (name, title, day, post, callback) {
+Post.update = function (name, title, day, post, tags, callback) {
 	mongodb.open(function (err, db) {
 		if (err) {
 			return callback(err);
@@ -193,7 +195,7 @@ Post.update = function (name, title, day, post, callback) {
 					'time.day': day
 				},
 				{
-					$set: { 'post': post }
+					$set: { 'post': post, 'tags': tags }
 				},
 				function (err) {
 					mongodb.close();
@@ -201,6 +203,28 @@ Post.update = function (name, title, day, post, callback) {
 						return callback(err);
 					}
 					callback(null);
+				});
+		});
+	});
+}
+
+Post.getTags = function (callback) {
+	mongodb.open(function (err, db) {
+		if (err) {
+			return callback(err);
+		}
+		db.collection('posts', function (err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			collection.distinct(
+				'tags', function (err, tags) {
+					mongodb.close();
+					if (err) {
+						return callback(err);
+					}
+					callback(null, tags);
 				});
 		});
 	});
