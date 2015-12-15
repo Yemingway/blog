@@ -5,10 +5,14 @@
     作者：<a href="/u/<%= post.name %>"><%= post.name %></a> 
     日期：<%= post.time.minute %>
   </p>
-  <p class = "">
+  <p class = "info">
     标签：<% post.tags.forEach(function(tag,index){ %>
     <%= tag %>
     <% }) %>
+  </p>
+  <p class = "info">
+  阅读：<%= post.pv%>
+  评论：<%= post.comments.length%>
   </p>
   <p><%- post.post %></p>
 <% }) %>

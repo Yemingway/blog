@@ -5,6 +5,9 @@
   标签：<% post.tags.forEach(function(tag,index) { %>
   <input type="text" name = "tag<%= index%>" value = "<%= tag %>" />
   <% }) %> <br/>
+  阅读：<input type="text" name = "pvCount" value = "<%= post.pv%>" disabled = "disabled" />
+  评论：<input type = "text" name = "commentsCount" value = "<%= post.comments.length%>" disabled = "disabled" />
+  <br/>
   正文：<br />
   <textarea name="post" rows="20" cols="100"><%= post.post %></textarea><br />
   <input type="submit" value="保存修改" />
