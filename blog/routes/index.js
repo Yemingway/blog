@@ -298,6 +298,40 @@ router.get('/tag', function (req, res) {
     })
   });
 });
+
+router.get('/tags/:tag', function (req, res) {
+  Post.getArticleByTag(req.params.tag, function (err, docs) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('/');
+    }
+    res.render('archive', {
+      title: 'TAG:' + req.params.tag,
+      posts: docs,
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    });
+  });
+});
+router.get('/search', function (req, res) {
+  Post.search(req.query.keyword, function (err, docs) {
+    if (err) {
+      req.flash('error', err);
+      return res.redirect('/');
+    }
+    res.render('archive', {
+      title: 'SEARCH:' + req.query.keyword,
+      posts: docs,
+      user: req.session.user,
+      success: req.flash('success').toString(),
+      error: req.flash('error').toString()
+    });
+  });
+});
+router.use(function (req, res) {
+  res.render('404');
+});
 function checkLogin(req, res, next) {
   if (!req.session.user) {
     req.flash('error', '用户未登录！');

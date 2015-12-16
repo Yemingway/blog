@@ -7,7 +7,7 @@
   </p>
   <p class = "info">
     标签：<% post.tags.forEach(function(tag,index){ %>
-    <%= tag %>
+    <a href = "/tags/<%= tag %>" class = "tag"><%= tag%></a>
     <% }) %>
   </p>
   <p class = "info">
