@@ -1,11 +1,12 @@
 var mongodb = require('./db');
 var markdown = require('markdown').markdown;
 
-function Post(name, title, post, tags) {
+function Post(name, title, post, tags, head) {
 	this.name = name;
 	this.title = title;
 	this.post = post;
 	this.tags = tags;
+	this.head = head;
 }
 
 module.exports = Post;
@@ -30,7 +31,8 @@ Post.prototype.save = function (callback) {
 		post: this.post,
 		comments: [],
 		tags: this.tags,
-		pv: 0
+		pv: 0,
+		head: this.head
 	};
 
 	mongodb.open(function (err, db) {
@@ -286,7 +288,7 @@ Post.search = function (keyword, callback) {
 				mongodb.close();
 				return callback(err);
 			}
-			var tempTag = new RegExp(keyword,"i");
+			var tempTag = new RegExp(keyword, "i");
 			collection.find(
 				{
 					'title': tempTag

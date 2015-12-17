@@ -123,7 +123,10 @@ router.post('/post', checkLogin);
 router.post('/post', function (req, res) {
   var currentUser = req.session.user,
     tags = [req.body.tag1, req.body.tag2, req.body.tag3],
-    post = new Post(currentUser.name, req.body.title, req.body.post, tags);
+    md5 = crypto.createHash('md5'),
+    email_MD5 = md5.update(currentUser.email.toLowerCase()).digest('hex'),
+    head = "https://secure.gravatar.com/avatar/" + email_MD5 + "?s=48",
+    post = new Post(currentUser.name, req.body.title, req.body.post, tags, head);
   post.save(function (err) {
     if (err) {
       req.flash('error', err);
@@ -201,12 +204,16 @@ router.post('/u/:name/:day/:title', function (req, res) {
   var date = new Date(),
     time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
       date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+  var md5 = crypto.createHash('md5'),
+    email_MD5 = md5.update(req.body.email.toLowerCase()).digest('hex'),
+    head = "https://secure.gravatar.com/avatar/" + email_MD5 + "?s=48";
   var comment = {
     name: req.body.name,
     email: req.body.email,
     website: req.body.website,
     time: time,
-    content: req.body.content
+    content: req.body.content,
+    head: head
   };
   var newComment = new Comment(req.params.name, req.params.day, req.params.title, comment);
   newComment.save(function (err) {

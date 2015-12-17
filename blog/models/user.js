@@ -1,6 +1,7 @@
 //create use modle and create save, read and write methods
 
 var mongodb = require('./db');
+var crypto = require('crypto');
 
 function User(user) {
 	this.name = user.name;
@@ -9,11 +10,15 @@ function User(user) {
 }
 
 User.prototype.save = function (callback) {
-	var user = {
-		name: this.name,
-		password: this.password,
-		email: this.email
-	};
+	var md5 = crypto.createHash('md5'),
+		email_MD5 = md5.update(this.email.toLowerCase()).digest('hex'),
+		head = "https://secure.gravatar.com/avatar/" + email_MD5 + "?s=48",
+		user = {
+			name: this.name,
+			password: this.password,
+			email: this.email,
+			head: head
+		};
 	
 	//open db
 	mongodb.open(function (err, db) {
