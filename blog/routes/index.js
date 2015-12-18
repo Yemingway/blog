@@ -126,7 +126,7 @@ router.post('/post', function (req, res) {
     md5 = crypto.createHash('md5'),
     email_MD5 = md5.update(currentUser.email.toLowerCase()).digest('hex'),
     head = "https://secure.gravatar.com/avatar/" + email_MD5 + "?s=48",
-    post = new Post(currentUser.name, req.body.title, req.body.post, tags, head);
+    post = new Post(currentUser.name, req.body.title, req.body.post, tags, head, {});
   post.save(function (err) {
     if (err) {
       req.flash('error', err);
@@ -272,7 +272,20 @@ router.post('/edit/:name/:day/:title', function (req, res) {
       res.redirect(url);
     });
 });
-
+router.get('/reprint/:name/:day/:title',checkLogin);
+router.get('/reprint/:name/:day/:title',function(req,res){
+  var currentUser = req.session.user;
+  Post.reprint(req.params.name,req.params.title,req.params.day,currentUser.name,function(err){
+     var url = encodeURI('/u/' + currentUser.name
+        + '/' + req.params.day + '/' + req.params.title);
+    if(err){
+      req.flash('error',err);
+      return res.redirect(url);
+    }
+    req.flash('success','转载成功');
+    res.redirect(url);
+  });
+});
 router.get('/archive', checkLogin);
 router.get('/archive', function (req, res) {
   var name = req.session.user.name;

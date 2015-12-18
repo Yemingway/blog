@@ -135,6 +135,11 @@ req.param('name')
 > mongod --dbpath ../blog/
 以上命令的意思是:设置 blog 文件夹作为我们工程的存储目录并启动数据库。
 
+> use blog
+> db.posts.find({})
+
+查询所有的post数据
+
 ## MongoDb 操作
 
 1. insert操作

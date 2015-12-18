@@ -1,12 +1,13 @@
 var mongodb = require('./db');
 var markdown = require('markdown').markdown;
 
-function Post(name, title, post, tags, head) {
+function Post(name, title, post, tags, head, reprint) {
 	this.name = name;
 	this.title = title;
 	this.post = post;
 	this.tags = tags;
 	this.head = head;
+	this.reprint = reprint;
 }
 
 module.exports = Post;
@@ -32,7 +33,8 @@ Post.prototype.save = function (callback) {
 		comments: [],
 		tags: this.tags,
 		pv: 0,
-		head: this.head
+		head: this.head,
+		reprint: {}
 	};
 
 	mongodb.open(function (err, db) {
@@ -307,6 +309,69 @@ Post.search = function (keyword, callback) {
 						}
 						callback(null, docs);
 					});
+		});
+	});
+}
+
+Post.reprint = function (fromname, title, day, toname, callback) {
+	mongodb.open(function (err, db) {
+		if (err) {
+			return callback(err);
+		}
+		db.collection('posts', function (err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			var query = {};
+			query['name'] = fromname;
+			query['title'] = title;
+			query['time.day'] = day;
+			collection.findOne(query,
+				function (err, doc) {
+					if (doc) {
+						var date = new Date();
+						var time = {
+							date: date,
+							year: date.getFullYear(),
+							month: date.getFullYear() + "-" + (date.getMonth() + 1),
+							day: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
+							minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
+							date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
+						}
+						var post = {
+							name: toname,
+							time: time,
+							title: title,
+							post: doc.post,
+							comments: [],
+							tags: doc.tags,
+							pv: 0,
+							head: doc.head,
+							reprint: {
+								reprintfrom: {
+									name: fromname,
+									time: doc.time,
+									title: title
+								}
+							}
+						};
+						collection.insert(post, { safe: true }, function (err) {
+							if (err) {
+								return callback(err);
+							}
+							collection.update({ 'name': fromname, 'title': title, 'time.day': day }, { $push: { 'reprint.reprintto': { 'name': toname, 'title': title, 'time': time } } }
+								, function (err) {
+									mongodb.close();
+									if (err) {
+										return callback(err);
+									}
+									return callback(null);
+								});
+						});
+
+					}
+				});
 		});
 	});
 }

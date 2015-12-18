@@ -1,8 +1,12 @@
 <%- include header %>
-<% if(user && user.name == post.name) { %>
+<% if(user && post) { %>
 <p>
+<% if(user.name == post.name) { %>
 <span><a class="edit" href = "/edit/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">编辑</a></span>
 <span><a class = "edit" href = "/remove/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">删除</a></span>
+<% } else { %>
+<span><a class = "edit" href = "/reprint/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">转载</a></span>
+<% } %>
 </p>
 <% } %>
 <p class="info">
