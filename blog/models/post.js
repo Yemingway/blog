@@ -186,12 +186,35 @@ Post.delete = function (name, title, day, callback) {
 			if (day) {
 				deleteItem['time.day'] = day;
 			}
-			collection.remove(deleteItem, { w: 1 }, function (err) {
-				mongodb.close();
+			collection.findOne(deleteItem, function (err, doc) {
 				if (err) {
 					return callback(err);
 				}
-				callback(null);
+				var queryItem = {};
+				if (doc && doc.reprint && doc.reprint.reprintfrom) {
+					var reprintfrom = doc.reprint.reprintfrom[0];
+					queryItem = { 'name': reprintfrom.name, 'time.day': reprintfrom.time.day, 'title': reprintfrom.title };
+				}
+				collection.remove(deleteItem, { w: 1 }, function (err) {
+					if (err) {
+						return callback(err);
+					}
+					if (queryItem) {
+						collection.update(queryItem,
+							{ $pull: { 'reprint.reprintto': { 'name': name, 'day': day, 'title': title } } }
+							, function (err) {
+								mongodb.close();
+								if (err) {
+									return callback(err);
+								}
+								return callback(null);
+							});
+					}
+					else {
+						mongodb.close();
+						return callback(null);
+					}
+				});
 			});
 		});
 	});
@@ -221,7 +244,7 @@ Post.update = function (name, title, day, post, tags, callback) {
                     if (err) {
 						return callback(err);
 					}
-					callback(null);
+					return callback(null);
 				});
 		});
 	});
@@ -349,11 +372,11 @@ Post.reprint = function (fromname, title, day, toname, callback) {
 							pv: 0,
 							head: doc.head,
 							reprint: {
-								reprintfrom: {
+								reprintfrom: [{
 									name: fromname,
 									time: doc.time,
 									title: title
-								}
+								}]
 							}
 						};
 						collection.insert(post, { safe: true }, function (err) {
