@@ -29,6 +29,10 @@
 <p class = "info">
   阅读：<%= post.pv%>
   评论：<%= post.comments.length%>
+  转载：<% if(post.reprint.reprintto) { %>
+  <%= post.reprint.reprintto.length%>
+  <% } else { %>
+  0 <% } %>
  </p>
 <p><%- post.post %></p>
 <%- include comments %>

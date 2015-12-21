@@ -365,7 +365,7 @@ Post.reprint = function (fromname, title, day, toname, callback) {
 						var post = {
 							name: toname,
 							time: time,
-							title: title,
+							title: '[转载] '+title,
 							post: doc.post,
 							comments: [],
 							tags: doc.tags,
