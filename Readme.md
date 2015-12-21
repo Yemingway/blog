@@ -1,5 +1,5 @@
 # BLOG 
-使用 express + Mongodb 搭建
+使用 express + Mongodb + angularjs + bootstrap 搭建
 
 # Nodejs 学习笔记
 
@@ -229,6 +229,8 @@ setting for VS Code
 		}
 	]
 }`
+
+
 
 
 
