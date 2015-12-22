@@ -14,10 +14,13 @@
     "morgan": "~1.6.1",
     "serve-favicon": "~2.3.0",
     "mongodb": "1.4.15",
+    "mongoose": "~4.0.8",
     "express-session": "~1.9.1",
     "connect-mongo": "0.4.1",
     "connect-flash": "0.1.1",
     "markdown": "0.5.0",
-    "multer": "~0.1.6"
+    "multer": "~0.1.6",
+    "compression": "~1.5.2",
+    "winston": "~1.0.1"
   }
 }

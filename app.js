@@ -4,7 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var db = require('./models/db');
+//var log = require('./models/log');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var settings = require('./settings');
@@ -104,6 +105,16 @@ app.use(function (err, req, res, next) {
   });
 });
 
+// http response data
+var successResponse = {
+    "result": "success",
+    "data": {}
+};
+
+var failResponse = {
+    "result": "fail",
+    "error": ""
+};
 // app.use(session({
 //   secret: settings.cookieSecret,
 //   key: settings.db,
@@ -117,4 +128,57 @@ app.use(function (err, req, res, next) {
 //   saveUninitialized: true
 // }));
 // app.use(flash());
+
+// API: get_article_list
+// create application/json parser, this will parse the json form data from the req
+var jsonParser = bodyParser.json();
+app.post('/get_article_list', jsonParser, function(req, res) {
+    res.writeHeader(200, {"Content-Type": "text/html"});
+    
+    // get the form data
+    var currentPage = req.body.current_page;
+    var articleNumPerPage = req.body.article_num_per_page;
+    
+    //log.info("currentPage: " + currentPage + ", articleNumPerPage: " + articleNumPerPage);
+
+    //return the mock mock
+
+        /*  query data from mongodb
+         *  here we will use mongoose to get data from mongodb.
+         *  and sort api can let us sort the data in mongodb before search. We sort as the date.
+         *  and skip, limit api can let us achieve the range query when user query different page's data.
+         */
+        
+        db.find({}, function(err, data) {
+            if (err) {
+                //log.info("Database Error: get data from collection. Error: " + err);
+                failResponse.error = err;
+                res.write(JSON.stringify(failResponse));
+                res.end();
+            }
+            else {
+                //log.info("Database: get data success. data.length: " + data.length);
+
+                // get the number of the all articles
+                db.count(function(err, count) {
+                    if (err) {
+                        //log.info("Database Error: count articles number. Error: " + err);
+                        failResponse.error = err;
+                        res.write(JSON.stringify(failResponse));
+                    }
+                    else {
+                        //log.info("articles total number: " + count);
+                    
+                        successResponse.data = {};
+                        successResponse.data.total_aritcle_num = count;
+                        successResponse.data.article_list = data;
+                        
+                        // return response
+                        res.write(JSON.stringify(successResponse));
+                    }
+                    res.end();
+                });
+            }
+        }).select(db.show_fields).sort({'article_time':'desc'}).skip((currentPage-1) * articleNumPerPage).limit(articleNumPerPage);
+});
 module.exports = app;
