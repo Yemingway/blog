@@ -1,0 +1,18 @@
+{
+    "server": {
+        "port": 80
+    },
+    "db": {
+        "uri": "mongodb://localhost/blog"
+    },
+    "log": {
+        "filename": "debug.log",
+        "path": {
+            "windows": "./logs",
+            "linux": "/opt/node/nodejs-blog/logs"
+        },
+        "maxsize": 25165824,
+		"maxFiles": 20,
+        "level": "debug"
+    }
+}

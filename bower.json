@@ -1,0 +1,11 @@
+{
+  "name": "blog",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular": "*",
+    "angular-bootstrap": "~0.14.3",
+    "angular-route": "*",
+    "bootstrap": "~3.3.6"
+  },
+  "devDependencies": {}
+}
