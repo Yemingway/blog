@@ -16,6 +16,7 @@
 <span><a class = "edit" href = "/reprint/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">转载</a></span>
 <% } %>
 </p>
+<% } %>
 <p class="info">
   作者：<a href="/u/<%= post.name %>"><%= post.name %></a> | 
   日期：<%= post.time.minute %>
@@ -35,5 +36,4 @@
  </p>
 <p><%- post.post %></p>
 <%- include comments %>
-<% } %>
 <%- include footer %>

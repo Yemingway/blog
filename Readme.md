@@ -1,6 +1,3 @@
-# BLOG 
-使用 express + Mongodb + angularjs + bootstrap 搭建
-
 # Nodejs 学习笔记
 
 ## ejs 语法
@@ -196,11 +193,11 @@ setting for VS Code
 	"configurations": [
 		{
 			// Name of configuration; appears in the launch configuration drop down menu.
-			"name": "supervisor app.js",
+			"name": "Launch app.js",
 			// Type of configuration. Possible values: "node", "mono".
 			"type": "node",
 			// Workspace relative or absolute path to the program.
-			"program": "./bin/www",
+			"program": "blog/bin/www",
 			// Automatically stop program after launch.
 			"stopOnEntry": false,
 			// Command line arguments passed to the program.
@@ -229,8 +226,6 @@ setting for VS Code
 		}
 	]
 }`
-
-
 
 
 
