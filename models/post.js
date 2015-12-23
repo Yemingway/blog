@@ -1,4 +1,6 @@
-var mongodb = require('./db');
+//var mongodb = require('./db');
+var mongodb = require('mongodb').Db;
+var settings = require('../settings');
 var markdown = require('markdown').markdown;
 
 function Post(name, title, post, tags, head, reprint) {
@@ -37,7 +39,7 @@ Post.prototype.save = function (callback) {
         reprint: {}
     };
 
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
@@ -49,7 +51,8 @@ Post.prototype.save = function (callback) {
             collection.insert(post, {
                 safe: true
             }, function (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 if (err) {
                     return callback(err);
                 }
@@ -63,13 +66,14 @@ Post.prototype.save = function (callback) {
 //get all user's articles if name is null
 //get one user's articles if name is not null.
 Post.get = function (name, title, day, isEdit, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             var query = {};
@@ -84,7 +88,8 @@ Post.get = function (name, title, day, isEdit, callback) {
             }
             collection.find(query).sort({ time: -1 }).toArray(function (err, docs) {
                 if (err) {
-                    mongodb.close();
+                    //mongodb.close();
+                    db.close();
                     return callback(err);
                 }
                 if (!isEdit) {
@@ -92,14 +97,16 @@ Post.get = function (name, title, day, isEdit, callback) {
                     docs.forEach(function (doc) {
                         if (doc && name && title && day) {
                             collection.update(query, { $inc: { 'pv': 1 } }, function (err) {
-                                mongodb.close();
+                                //mongodb.close();
+                                db.close();
                                 if (err) {
                                     return callback(err);
                                 }
                             });
                         }
                         else {
-                            mongodb.close();
+                            //mongodb.close();
+                            db.close();
                         }
                         doc.post = markdown.toHTML(doc.post);
                         doc.comments.forEach(function (comment) {
@@ -108,7 +115,8 @@ Post.get = function (name, title, day, isEdit, callback) {
                     });
                 }
                 else {
-                    mongodb.close();
+                    //mongodb.close();
+                    db.close();
                 }
                 callback(null, docs);
             });
@@ -116,7 +124,7 @@ Post.get = function (name, title, day, isEdit, callback) {
     });
 }
 Post.getArchive = function (name, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             db.close();
             return callback(err);
@@ -137,14 +145,16 @@ Post.getArchive = function (name, callback) {
     });
 }
 Post.getTen = function (name, page, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
-            mongodb.close();
+            //mongodb.close();
+            db.close();
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             var query = {};
@@ -153,7 +163,8 @@ Post.getTen = function (name, page, callback) {
             }
             collection.count(query, function (err, total) {
                 collection.find(query, { limit: 10, skip: (page - 1) * 10 }).sort({ time: -1 }).toArray(function (err, docs) {
-                    mongodb.close();
+                    //mongodb.close();
+                    db.close();
                     if (err) {
                         return callback(err);
                     }
@@ -167,13 +178,14 @@ Post.getTen = function (name, page, callback) {
     });
 }
 Post.delete = function (name, title, day, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             var deleteItem = {};
@@ -197,37 +209,42 @@ Post.delete = function (name, title, day, callback) {
                 }
                 collection.remove(deleteItem, { w: 1 }, function (err) {
                     if (err) {
+                        //mongodb.close();
+                        db.close();
                         return callback(err);
                     }
-                    if (queryItem) {
-                        collection.update(queryItem,
-                            { $pull: { 'reprint.reprintto': { 'name': name, 'time.day': day, 'title': title } } }
-                            , function (err) {
-                                mongodb.close();
-                                if (err) {
-                                    return callback(err);
-                                }
-                                return callback(null);
-                            });
-                    }
-                    else {
-                        mongodb.close();
-                        return callback(null);
-                    }
                 });
+                if (queryItem) {
+                    collection.update(queryItem,
+                        { $pull: { 'reprint.reprintto': { 'name': name, 'time.day': day, 'title': title } } }
+                        , function (err) {
+                            //mongodb.close();
+                            db.close();
+                            if (err) {
+                                return callback(err);
+                            }
+                            return callback(null);
+                        });
+                }
+                else {
+                    //mongodb.close();
+                    db.close();
+                    return callback(null);
+                }
             });
         });
     });
 }
 
 Post.update = function (name, title, day, post, tags, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             collection.update(
@@ -240,7 +257,8 @@ Post.update = function (name, title, day, post, tags, callback) {
                     $set: { 'post': post, 'tags': tags }
                 },
                 function (err) {
-                    mongodb.close();
+                    //mongodb.close();
+                    db.close();
                     if (err) {
                         return callback(err);
                     }
@@ -251,18 +269,20 @@ Post.update = function (name, title, day, post, tags, callback) {
 }
 
 Post.getTags = function (callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             collection.distinct(
                 'tags', function (err, tags) {
-                    mongodb.close();
+                    //mongodb.close();
+                    db.close();
                     if (err) {
                         return callback(err);
                     }
@@ -272,13 +292,14 @@ Post.getTags = function (callback) {
     });
 }
 Post.getArticleByTag = function (tag, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             collection.find(
@@ -293,7 +314,8 @@ Post.getArticleByTag = function (tag, callback) {
                     {
                         time: -1
                     }).toArray(function (err, docs) {
-                        mongodb.close();
+                        //mongodb.close();
+                        db.close();
                         if (err) {
                             return callback(err);
                         }
@@ -304,13 +326,14 @@ Post.getArticleByTag = function (tag, callback) {
 }
 
 Post.search = function (keyword, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             var tempTag = new RegExp(keyword, "i");
@@ -326,7 +349,8 @@ Post.search = function (keyword, callback) {
                     {
                         time: -1
                     }).toArray(function (err, docs) {
-                        mongodb.close();
+                        //mongodb.close();
+                        db.close();
                         if (err) {
                             return callback(err);
                         }
@@ -337,13 +361,14 @@ Post.search = function (keyword, callback) {
 }
 
 Post.reprint = function (fromname, title, day, toname, callback) {
-    mongodb.open(function (err, db) {
+    mongodb.connect(settings.url, function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection('posts', function (err, collection) {
             if (err) {
-                mongodb.close();
+                //mongodb.close();
+                db.close();
                 return callback(err);
             }
             var query = {};
@@ -382,18 +407,21 @@ Post.reprint = function (fromname, title, day, toname, callback) {
                             };
                         collection.insert(post, { safe: true }, function (err) {
                             if (err) {
+                                //mongodb.close();
+                                db.close();
                                 return callback(err);
                             }
-                            collection.update({ 'name': fromname, 'title': title, 'time.day': day }, { $push: { 'reprint.reprintto': { 'name': toname, 'title': reprintTitle, 'time': time } } }
-                                , function (err) {
-                                    mongodb.close();
-                                    if (err) {
-                                        return callback(err);
-                                    }
-                                    return callback(null);
-                                });
                         });
-
+                        collection.update({ 'name': fromname, 'title': title, 'time.day': day },
+                            { $push: { 'reprint.reprintto': { 'name': toname, 'title': reprintTitle, 'time': time } } }
+                            , function (err) {
+                                //mongodb.close();
+                                db.close();
+                                if (err) {
+                                    return callback(err);
+                                }
+                                return callback(null);
+                            });
                     }
                 });
         });

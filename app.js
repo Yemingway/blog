@@ -23,7 +23,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(logger({stream: accessLog}));
 app.use(bodyParser.json());
@@ -37,15 +37,16 @@ app.use(function (err, req, res, next) {
 app.use(cookieParser());
 app.use(session({
   secret: settings.cookieSecret,
-  key: settings.db,
+  //key: settings.db,
   cookie: { maxAge: 1000 * 60 * 60 * 24 * 30 },
-  store: new MongoStore({
-    db: settings.db,
-    host: settings.host,
-    port: settings.port
-  }),
-  resave: false,
-  saveUninitialized: true
+//   store: new MongoStore({
+//     db: settings.db,
+//     host: settings.host,
+//     port: settings.port
+//   }),
+//   resave: false,
+//   saveUninitialized: true,
+  url:settings.url
 }));
 app.use(flash());
 app.use('/', routes);

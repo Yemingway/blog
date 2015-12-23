@@ -1,7 +1,9 @@
 //create use modle and create save, read and write methods
 
-var mongodb = require('./db');
+//var mongodb = require('./db');
 var crypto = require('crypto');
+var mongodb = require('mongodb').Db;
+var settings = require('../settings');
 
 function User(user) {
 	this.name = user.name;
@@ -21,14 +23,15 @@ User.prototype.save = function (callback) {
 		};
 	
 	//open db
-	mongodb.open(function (err, db) {
+	mongodb.connect(settings.url,function (err, db) {
 		if (err) {
 			return callback(err);
 		}
 		//read user records
 		db.collection('users', function (err, collection) {
 			if (err) {
-				mongodb.close();
+				//mongodb.close();
+                db.close();
 				return callback(err);
 			}
 			//add this records to users
@@ -44,19 +47,22 @@ User.prototype.save = function (callback) {
 
 User.get = function (name, callback) {
 	//open db
-	mongodb.open(function (err, db) {
+	mongodb.connect(settings.url,function (err, db) {
 		if (err) {
-			mongodb.close();
+			//mongodb.close();
+            db.close();
 			return callback(err);
 		}
 		//read users
 		db.collection('users', function (err, collection) {
 			if (err) {
-				mongodb.close();
+				//mongodb.close();
+                db.close();
 				return callback(err);
 			}
 			collection.findOne({ name: name }, function (err, user) {
-				mongodb.close();
+				//mongodb.close();
+                db.close();
 				if (err) {
 					callback(err);
 				}
