@@ -274,10 +274,12 @@ router.post('/edit/:name/:day/:title', function (req, res) {
 });
 router.get('/reprint/:name/:day/:title', checkLogin);
 router.get('/reprint/:name/:day/:title', function (req, res) {
-    var currentUser = req.session.user;
+    var currentUser = req.session.user,
+     date = new Date(),
+     day = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     Post.reprint(req.params.name, req.params.title, req.params.day, currentUser.name, function (err) {
         var url = encodeURI('/u/' + currentUser.name
-            + '/' + req.params.day + '/[转载] ' + req.params.title),
+            + '/' + day + '/[转载] ' + req.params.title),
             originUrl = encodeURI('/u/' + req.params.name
                 + '/' + req.params.day + '/' + req.params.title);
         if (err) {
