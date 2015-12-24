@@ -1,10 +1,38 @@
 <%- include header %>
-<article>
+<!-- Page Header -->
+<!-- Set your background image for this header on the line below. -->
+<header class="intro-header" style="background-image: url('img/home-bg.jpg')">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+				<div class="site-heading">
+					<h1>Welcome</h1>
+					<!--<hr class="small">-->
+					<span class="subheading">生活，值得更好。</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+<div class="container">
+	<div class="row">
+		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+<!--<article>-->
+<div class = "post-preview">
 <% posts.forEach(function (post, index) { %>
-  <p><h2>
-  <a href="/u/<%= post.name %>"><img src="<%= post.head %>" class="r_head" /></a>
-  <a href="/u/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a></h2></p>
-  <p class="info">
+  <!--<p><h2>-->
+  <!-- <a href="/u/<%= post.name %>"><img src="<%= post.head %>" class="r_head" /></a> -->
+  <a href="/u/<%= post.name %>/<%= post.time.day %>/<%= post.title %>">
+    <h2 class = "post-title">
+    <%= post.title %>
+    </h2>
+    <h3 class = "post-subtitle">
+    <%= post.title %>
+    </h3>
+  </a>
+  <p class = "post-meta"> Posted on <%= post.time.minute %> </p>
+  <!-- </h2></p>-->
+  <!--<p class="info">
     作者：<a href="/u/<%= post.name %>"><%= post.name %></a> 
     日期：<%= post.time.minute %>
   </p>
@@ -17,7 +45,9 @@
   阅读：<%= post.pv%>
   评论：<%= post.comments.length%>
   </p>
-  <p><%- post.post %></p>
+  <p><%- post.post %></p>-->
 <% }) %>
+</div>
+</div></div></div>
 <%- include paging %>
 <%- include footer %>
