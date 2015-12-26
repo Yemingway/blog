@@ -3,13 +3,14 @@ var mongodb = require('mongodb').Db;
 var settings = require('../settings');
 var markdown = require('markdown').markdown;
 
-function Post(name, title, post, tags, head, reprint) {
+function Post(name, title, post, tags, head, reprint, subtitle) {
     this.name = name;
     this.title = title;
     this.post = post;
     this.tags = tags;
     this.head = head;
     this.reprint = reprint;
+    this.subtitle = subtitle;
 }
 
 module.exports = Post;
@@ -36,7 +37,8 @@ Post.prototype.save = function (callback) {
         tags: this.tags,
         pv: 0,
         head: this.head,
-        reprint: {}
+        reprint: {},
+        subtitle: this.subtitle
     };
 
     mongodb.connect(settings.url, function (err, db) {

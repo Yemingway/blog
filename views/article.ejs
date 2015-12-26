@@ -1,40 +1,28 @@
 <%- include header %>
-<% if(post) { if(user) { %>
-<% var flag = 1%>
-<p>
-<% if(user.name == post.name) { %>
-<span><a class="edit" href = "/edit/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">编辑</a></span>
-<span><a class = "edit" href = "/remove/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">删除</a></span>
-<% } else { %>
-<% if(post.reprint && post.reprint.reprintto && post.reprint.reprintto.length > 0) { %>
-<% post.reprint.reprintto.forEach(function(printtoinfo,index){ %>
-<% if(printtoinfo.name == user.name) { flag = 1 } else { flag = 0 }}) %>
-<% } else { %>
-<% flag = 0 %>
-<% }} %>
-<% if (flag == 0) { %>
-<span><a class = "edit" href = "/reprint/<%= post.name %>/<%= post.time.day%>/<%= post.title%>">转载</a></span>
-<% }} %>
+<header class="intro-header" style="background-image: url('img/about-bg.jpg')">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+				<div class="post-heading">
+					<h1><%= post.title%></h1>
+				    <h2 class="subheading"><%= post.subtitle%></h2>
+					<span class="meta">Posted on <%= post.time.day%></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+<!-- Post Content -->
+<article>
+	<div class="container">
+		<div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <!-- article content -->
+                <div><%= post.post%></div>
+			</div>
+		</div>
+	</div>
+</article>
 
-</p>
-<p class="info">
-  作者：<a href="/u/<%= post.name %>"><%= post.name %></a> | 
-  日期：<%= post.time.minute %>
-</p>
-<p>
-标签： <% post.tags.forEach(function(tag,index) { %>
-<%= tag%>
-<% }) %>
-</p>
-<p class = "info">
-  阅读：<%= post.pv%>
-  评论：<%= post.comments.length%>
-  转载：<% if(post.reprint.reprintto) { %>
-  <%= post.reprint.reprintto.length%>
-  <% } else { %>
-  0 <% } %>
- </p>
-<p><%- post.post %></p>
-<%- include comments %>
-<% } %>
+<hr>
 <%- include footer %>

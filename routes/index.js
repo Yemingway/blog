@@ -25,6 +25,14 @@ router.get('/', function (req, res) {
     });
 });
 
+router.get('/about', function (req, res) {
+    res.render('about', {
+        title: '关于',
+        user: req.session.user,
+        success: req.flash('success').toString(),
+        error: req.flash('error').toString()
+    });
+});
 router.get('/reg', checkNotLogin);
 router.get('/reg', function (req, res) {
     res.render('reg', {
@@ -126,7 +134,7 @@ router.post('/post', function (req, res) {
         md5 = crypto.createHash('md5'),
         email_MD5 = md5.update(currentUser.email.toLowerCase()).digest('hex'),
         head = "https://secure.gravatar.com/avatar/" + email_MD5 + "?s=48",
-        post = new Post(currentUser.name, req.body.title, req.body.post, tags, head, {});
+        post = new Post(currentUser.name, req.body.title, req.body.post, tags, head, {},req.body.subtitle);
     post.save(function (err) {
         if (err) {
             req.flash('error', err);
@@ -275,8 +283,8 @@ router.post('/edit/:name/:day/:title', function (req, res) {
 router.get('/reprint/:name/:day/:title', checkLogin);
 router.get('/reprint/:name/:day/:title', function (req, res) {
     var currentUser = req.session.user,
-     date = new Date(),
-     day = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
+        date = new Date(),
+        day = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     Post.reprint(req.params.name, req.params.title, req.params.day, currentUser.name, function (err) {
         var url = encodeURI('/u/' + currentUser.name
             + '/' + day + '/[转载] ' + req.params.title),
